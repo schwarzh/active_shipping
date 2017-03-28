@@ -238,6 +238,7 @@ module ActiveShipping
                 xml.GroupPackageCount(1)
                 build_package_weight_node(xml, package, imperial)
                 build_package_dimensions_node(xml, package, imperial)
+                build_package_insurance_node(xml, pkg)
 
                 # Reference Numbers
                 reference_numbers = Array(package.options[:reference_numbers])
@@ -354,6 +355,7 @@ module ActiveShipping
           xml.GroupPackageCount(1)
           build_package_weight_node(xml, pkg, imperial)
           build_package_dimensions_node(xml, pkg, imperial)
+          build_package_insurance_node(xml, pkg)
         end
       end
     end
@@ -406,6 +408,15 @@ module ActiveShipping
           xml.public_send(axis.to_s.capitalize, value.ceil)
         end
         xml.Units(imperial ? 'IN' : 'CM')
+      end
+    end
+    
+    def build_package_insured_node(xml, pkg)
+      if package_value = pkg.options[:value]
+        xml.InsuredValue do
+          xml.Currency(package.options[:currency] || 'USD')
+          xml.Amount(package_value.to_f)
+        end
       end
     end
 
