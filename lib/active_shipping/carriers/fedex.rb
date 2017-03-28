@@ -414,7 +414,7 @@ module ActiveShipping
     def build_package_insurance_node(xml, pkg)
       if package_value = pkg.options[:value]
         xml.InsuredValue do
-          xml.Currency(package.options[:currency] || 'USD')
+          xml.Currency(pkg.options[:currency] || 'USD')
           xml.Amount(package_value.to_f)
         end
       end
