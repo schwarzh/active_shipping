@@ -238,8 +238,7 @@ module ActiveShipping
                 xml.GroupPackageCount(1)
                 build_package_weight_node(xml, package, imperial)
                 build_package_dimensions_node(xml, package, imperial)
-                build_package_insurance_node(xml, pkg)
-
+                
                 # Reference Numbers
                 reference_numbers = Array(package.options[:reference_numbers])
                 if reference_numbers.size > 0
@@ -338,6 +337,11 @@ module ActiveShipping
                 xml.Indicia(options[:smart_post_indicia] || 'PARCEL_SELECT')
                 xml.HubId(options[:smart_post_hub_id] || 5902) # default to LA
               end
+              
+             
+              if package_value = packages.map(&:value).inject(0, :+)
+                xml.TotalInsuredValue(package_value.to_f)
+              end
 
               build_rate_request_types_node(xml)
               xml.PackageCount(packages.size)
@@ -355,7 +359,6 @@ module ActiveShipping
           xml.GroupPackageCount(1)
           build_package_weight_node(xml, pkg, imperial)
           build_package_dimensions_node(xml, pkg, imperial)
-          build_package_insurance_node(xml, pkg)
         end
       end
     end
@@ -410,15 +413,7 @@ module ActiveShipping
         xml.Units(imperial ? 'IN' : 'CM')
       end
     end
-    
-    def build_package_insurance_node(xml, pkg)
-      if package_value = pkg.options[:value]
-        xml.InsuredValue do
-          xml.Currency(pkg.options[:currency] || 'USD')
-          xml.Amount(package_value.to_f)
-        end
-      end
-    end
+       
 
     def build_rate_request_types_node(xml, type = 'ACCOUNT')
       xml.RateRequestTypes(type)
