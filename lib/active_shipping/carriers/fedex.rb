@@ -316,9 +316,7 @@ module ActiveShipping
             end
             
             if package_value = packages.map(&:value).inject(0, :+)
-              xml.TotalInsuredValue do 
-                xml.Amount(package_value)
-              end 
+              xml.TotalInsuredValue(package_value)
             end
 
             freight = has_freight?(options)
