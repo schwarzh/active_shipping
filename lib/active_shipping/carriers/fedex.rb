@@ -305,12 +305,18 @@ module ActiveShipping
 
           # Returns saturday delivery shipping options when available
           xml.VariableOptions('SATURDAY_DELIVERY')
+          
+          
 
           xml.RequestedShipment do
             if options[:pickup_date]
               xml.ShipTimestamp(options[:pickup_date].to_time.iso8601(0))
             else
               xml.ShipTimestamp(ship_timestamp(options[:turn_around_time]).iso8601(0))
+            end
+            
+            if package_value = packages.map(&:value).inject(0, :+)
+              xml.TotalInsuredValue(package_value.to_f)
             end
 
             freight = has_freight?(options)
@@ -337,11 +343,8 @@ module ActiveShipping
                 xml.Indicia(options[:smart_post_indicia] || 'PARCEL_SELECT')
                 xml.HubId(options[:smart_post_hub_id] || 5902) # default to LA
               end
-              
+                     
              
-              if package_value = packages.map(&:value).inject(0, :+)
-                xml.TotalInsuredValue(package_value.to_f)
-              end
 
               build_rate_request_types_node(xml)
               xml.PackageCount(packages.size)
